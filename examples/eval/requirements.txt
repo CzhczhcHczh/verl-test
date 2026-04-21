@@ -1,0 +1,16 @@
+torch>=2.0.0
+transformers>=4.40.0
+datasets>=2.18.0
+peft>=0.10.0
+Pillow>=10.0.0
+tqdm
+numpy
+accelerate>=0.29.0
+sentencepiece
+protobuf
+# EMMA symbolic math
+latex2sympy2
+word2number
+# Flickr30k captioning metrics
+pycocoevalcap
+pycocotools
