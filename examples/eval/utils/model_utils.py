@@ -1,3 +1,16 @@
+# Copyright 2026 Bytedance Ltd. and/or its affiliates
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 """
 Shared model loading and generation utilities for all benchmark evaluations.
 Supports Qwen2.5-VL (and compatible VLMs) with optional LoRA adapters.
@@ -12,9 +25,8 @@ from PIL import Image
 logger = logging.getLogger(__name__)
 
 
-def load_model(model_path: str, lora_path: str | None = None, device: str = "auto",
-               torch_dtype=None):
-    from transformers import AutoProcessor, AutoModelForVision2Seq
+def load_model(model_path: str, lora_path: str | None = None, device: str = "auto", torch_dtype=None):
+    from transformers import AutoModelForVision2Seq, AutoProcessor
 
     if torch_dtype is None:
         torch_dtype = torch.bfloat16
@@ -32,6 +44,7 @@ def load_model(model_path: str, lora_path: str | None = None, device: str = "aut
 
     if lora_path:
         from peft import PeftModel
+
         logger.info(f"Loading LoRA adapter from {lora_path}")
         model = PeftModel.from_pretrained(model, lora_path)
         model = model.merge_and_unload()
@@ -66,9 +79,15 @@ def build_multimodal_messages(prompt_messages: list[dict], images: list[Image.Im
 
 
 @torch.no_grad()
-def generate_response(model, processor, prompt_messages: list[dict], images: list[Image.Image] | None = None,
-                      max_new_tokens: int = 2048, temperature: float = 0.0,
-                      top_p: float = 1.0) -> str:
+def generate_response(
+    model,
+    processor,
+    prompt_messages: list[dict],
+    images: list[Image.Image] | None = None,
+    max_new_tokens: int = 2048,
+    temperature: float = 0.0,
+    top_p: float = 1.0,
+) -> str:
     images = images or []
     messages = build_multimodal_messages(prompt_messages, images)
 

@@ -1,3 +1,16 @@
+# Copyright 2026 Bytedance Ltd. and/or its affiliates
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 """
 Common utility functions shared across all benchmark evaluation scripts.
 Extended version with helpers for ChartQA, VQA-style, letter extraction, etc.
@@ -6,14 +19,13 @@ Extended version with helpers for ChartQA, VQA-style, letter extraction, etc.
 import json
 import re
 import statistics
-import string
 
 import numpy as np
-
 
 # ---------------------------------------------------------------------------
 # Basic extraction helpers
 # ---------------------------------------------------------------------------
+
 
 def extract_boxed(text: str) -> str | None:
     """Extract content from the last \\boxed{...} in text."""
@@ -34,7 +46,7 @@ def extract_boxed(text: str) -> str | None:
         i += 1
     if right is None:
         return None
-    return text[idx + len("\\boxed{"):right].strip()
+    return text[idx + len("\\boxed{") : right].strip()
 
 
 def extract_answer_tag(text: str) -> str | None:
@@ -99,8 +111,10 @@ def parse_choice_from_response(response: str, num_choices: int = 4) -> str | Non
 # ChartQA: relaxed correctness (5% numeric tolerance)
 # ---------------------------------------------------------------------------
 
+
 def relaxed_correctness(prediction: str, target: str, max_relative_change: float = 0.05) -> bool:
     """Relaxed correctness from ChartQA paper (Methani et al. 2020)."""
+
     def _to_float(text: str):
         try:
             if text.endswith("%"):
@@ -123,6 +137,7 @@ def relaxed_correctness(prediction: str, target: str, max_relative_change: float
 # CV-Bench / BLINK / V*Bench: extract answer letter
 # ---------------------------------------------------------------------------
 
+
 def extract_answer_letter(text: str) -> str:
     """Extract the answer choice letter (A-Z) from a string."""
     text = text.strip()
@@ -135,6 +150,7 @@ def extract_answer_letter(text: str) -> str:
 # ---------------------------------------------------------------------------
 # POPE: extract yes/no
 # ---------------------------------------------------------------------------
+
 
 def extract_yes_no_simple(text: str) -> str:
     """Extract 'yes' or 'no' from model response."""
@@ -155,24 +171,78 @@ def extract_yes_no_simple(text: str) -> str:
 # ---------------------------------------------------------------------------
 
 _CONTRACTIONS = {
-    "aint": "ain't", "arent": "aren't", "cant": "can't", "couldve": "could've",
-    "couldnt": "couldn't", "didnt": "didn't", "doesnt": "doesn't", "dont": "don't",
-    "hadnt": "hadn't", "hasnt": "hasn't", "havent": "haven't", "hed": "he'd",
-    "hes": "he's", "isnt": "isn't", "itd": "it'd", "its": "it's", "mightve": "might've",
-    "mustve": "must've", "neednt": "needn't", "oclock": "o'clock", "shouldve": "should've",
-    "shouldnt": "shouldn't", "thatd": "that'd", "thats": "that's", "theyd": "they'd",
-    "theyre": "they're", "theyve": "they've", "wasnt": "wasn't", "werent": "weren't",
-    "whatll": "what'll", "whatre": "what're", "whats": "what's", "whatve": "what've",
-    "wheres": "where's", "whod": "who'd", "wholl": "who'll", "whos": "who's",
-    "whove": "who've", "wont": "won't", "wouldve": "would've", "wouldnt": "wouldn't",
-    "yall": "y'all", "youd": "you'd", "youll": "you'll", "youre": "you're", "youve": "you've",
+    "aint": "ain't",
+    "arent": "aren't",
+    "cant": "can't",
+    "couldve": "could've",
+    "couldnt": "couldn't",
+    "didnt": "didn't",
+    "doesnt": "doesn't",
+    "dont": "don't",
+    "hadnt": "hadn't",
+    "hasnt": "hasn't",
+    "havent": "haven't",
+    "hed": "he'd",
+    "hes": "he's",
+    "isnt": "isn't",
+    "itd": "it'd",
+    "its": "it's",
+    "mightve": "might've",
+    "mustve": "must've",
+    "neednt": "needn't",
+    "oclock": "o'clock",
+    "shouldve": "should've",
+    "shouldnt": "shouldn't",
+    "thatd": "that'd",
+    "thats": "that's",
+    "theyd": "they'd",
+    "theyre": "they're",
+    "theyve": "they've",
+    "wasnt": "wasn't",
+    "werent": "weren't",
+    "whatll": "what'll",
+    "whatre": "what're",
+    "whats": "what's",
+    "whatve": "what've",
+    "wheres": "where's",
+    "whod": "who'd",
+    "wholl": "who'll",
+    "whos": "who's",
+    "whove": "who've",
+    "wont": "won't",
+    "wouldve": "would've",
+    "wouldnt": "wouldn't",
+    "yall": "y'all",
+    "youd": "you'd",
+    "youll": "you'll",
+    "youre": "you're",
+    "youve": "you've",
 }
 _ARTICLES = ["a", "an", "the"]
 _PERIOD_STRIP = re.compile(r"(?!<=\d)(\.)(?!\d)")
 _COMMA_STRIP = re.compile(r"(\d)(,)(\d)")
 _PUNCT = [
-    ";", "/", "[", "]", '"', "{", "}", "(", ")", "=", "+", "\\",
-    "_", "-", ">", "<", "@", "`", ",", "?", "!",
+    ";",
+    "/",
+    "[",
+    "]",
+    '"',
+    "{",
+    "}",
+    "(",
+    ")",
+    "=",
+    "+",
+    "\\",
+    "_",
+    "-",
+    ">",
+    "<",
+    "@",
+    "`",
+    ",",
+    "?",
+    "!",
 ]
 
 
@@ -224,6 +294,7 @@ def vqa_accuracy(pred: str, answers: list[str]) -> float:
 # CoT reasoning: extract answer from <answer> or \boxed{} with numeric compare
 # ---------------------------------------------------------------------------
 
+
 def reasoning_extract_and_compare(response: str, ground_truth: str) -> float:
     """Extract answer from CoT response and compare with ground truth."""
     extracted = extract_answer_tag(response)
@@ -256,14 +327,16 @@ def reasoning_extract_and_compare(response: str, ground_truth: str) -> float:
 # JSON save helper
 # ---------------------------------------------------------------------------
 
+
 def save_json(data, path: str):
     """Save JSON with numpy/bool type handling."""
+
     def _default(o):
-        if isinstance(o, (np.integer,)):
+        if isinstance(o, np.integer):
             return int(o)
-        if isinstance(o, (np.floating,)):
+        if isinstance(o, np.floating):
             return float(o)
-        if isinstance(o, (np.bool_,)):
+        if isinstance(o, np.bool_):
             return bool(o)
         if isinstance(o, np.ndarray):
             return o.tolist()

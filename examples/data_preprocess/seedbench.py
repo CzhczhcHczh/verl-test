@@ -1,9 +1,26 @@
+# Copyright 2026 Bytedance Ltd. and/or its affiliates
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 """
 Preprocess SEED-Bench dataset to VERL parquet format.
 HF: lmms-lab/SEED-Bench (image-only questions).
 Usage: python examples/data_preprocess/seedbench.py --local_save_dir ~/data/seedbench
 """
-import argparse, os, datasets
+
+import argparse
+import os
+
+import datasets
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -20,7 +37,6 @@ if __name__ == "__main__":
     IMAGE_CATEGORIES = list(range(1, 10))
 
     def process(example, idx):
-        data_type = example.get("data_type", "")
         question_type = example.get("question_type_id", 0)
         if question_type not in IMAGE_CATEGORIES:
             return None
@@ -37,9 +53,16 @@ if __name__ == "__main__":
         return {
             "data_source": "lmms-lab/SEED-Bench",
             "prompt": [{"role": "user", "content": content}],
-            "images": images, "ability": "visual_understanding",
+            "images": images,
+            "ability": "visual_understanding",
             "reward_model": {"style": "rule", "ground_truth": answer, "question_type_id": question_type},
-            "extra_info": {"split": args.split, "index": idx, "answer": answer, "question": question, "question_type_id": question_type},
+            "extra_info": {
+                "split": args.split,
+                "index": idx,
+                "answer": answer,
+                "question": question,
+                "question_type_id": question_type,
+            },
         }
 
     results = []

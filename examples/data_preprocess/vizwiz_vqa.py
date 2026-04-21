@@ -1,9 +1,26 @@
+# Copyright 2026 Bytedance Ltd. and/or its affiliates
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 """
 Preprocess VizWiz-VQA dataset to VERL parquet format.
 HF: lmms-lab/VizWiz-VQA, validation split.
 Usage: python examples/data_preprocess/vizwiz_vqa.py --local_save_dir ~/data/vizwiz_vqa
 """
-import argparse, os, datasets
+
+import argparse
+import os
+
+import datasets
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -23,11 +40,13 @@ if __name__ == "__main__":
             answers = [str(example.get("answer", ""))]
         image = example.get("image")
         images = [image.convert("RGB")] if image else []
-        content = f"<image>\n\n{question}\nWhen the provided information is insufficient, respond with 'Unanswerable'.\nAnswer the question using a single word or phrase."
+        unanswerable_hint = "\nWhen the provided information is insufficient, respond with 'Unanswerable'."
+        content = f"<image>\n\n{question}{unanswerable_hint}\nAnswer the question using a single word or phrase."
         return {
             "data_source": "lmms-lab/VizWiz-VQA",
             "prompt": [{"role": "user", "content": content}],
-            "images": images, "ability": "visual_qa",
+            "images": images,
+            "ability": "visual_qa",
             "reward_model": {"style": "rule", "ground_truth": answers},
             "extra_info": {"split": args.split, "index": idx, "answers": answers, "question": question},
         }

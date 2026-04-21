@@ -1,9 +1,26 @@
+# Copyright 2026 Bytedance Ltd. and/or its affiliates
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 """
 Preprocess EMMA dataset to VERL parquet format.
 HF: lmms-lab/EMMA (math/science multimodal).
 Usage: python examples/data_preprocess/emma.py --local_save_dir ~/data/emma
 """
-import argparse, os, datasets
+
+import argparse
+import os
+
+import datasets
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -27,9 +44,17 @@ if __name__ == "__main__":
         return {
             "data_source": "lmms-lab/EMMA",
             "prompt": [{"role": "user", "content": content}],
-            "images": images, "ability": "math_science",
+            "images": images,
+            "ability": "math_science",
             "reward_model": {"style": "rule", "ground_truth": answer, "subject": subject, "difficulty": difficulty},
-            "extra_info": {"split": args.split, "index": idx, "answer": answer, "question": question, "subject": subject, "difficulty": difficulty},
+            "extra_info": {
+                "split": args.split,
+                "index": idx,
+                "answer": answer,
+                "question": question,
+                "subject": subject,
+                "difficulty": difficulty,
+            },
         }
 
     processed = dataset.map(process, with_indices=True, num_proc=1, remove_columns=dataset.column_names)
